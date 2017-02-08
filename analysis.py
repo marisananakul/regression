@@ -4,15 +4,15 @@
 # # Does faculty salary vary by gender?
 
 # ## Set up
-# 
+#
 # Before getting started, the only addtional library you should have to install (that did not come with the anaconda python distribution) is `seaborn`, a package for visualization:
-# 
+#
 # ```
 # pip install seaborn
 # ```
-# 
+#
 # Let's begin by reading in some data from [this course website](http://data.princeton.edu/wws509/datasets/#salary). Columns included are:
-# 
+#
 # - **sx** = Sex, coded 1 for female and 0 for male
 # - **rk** = Rank, coded
 #     - 1 for assistant professor,
@@ -41,13 +41,25 @@ get_ipython().magic(u'matplotlib inline')
 # In[249]:
 
 # Read data from URL
-file = urllib2.urlopen('http://data.princeton.edu/wws509/datasets/salary.dat')
-headers = file.next()
-df = pd.DataFrame(l.rstrip().split() for l in file)
+# file = urllib2.urlopen('http://data.princeton.edu/wws509/datasets/salary.dat')
+# headers = file.next()
+# df = pd.DataFrame(l.rstrip().split() for l in file)
+# df.columns = headers.rstrip().split()
+# df['sl'] = df['sl'].astype(float) # Make sure salary is float
+# df['yr'] = df['yr'].astype(int) # Make sure year is int is float
+# df['yd'] = df['yd'].astype(int) # Make sure salary is float
+
+from urllib.request import urlopen # to load data
+
+# Read data from URL
+file = urlopen('http://data.princeton.edu/wws509/datasets/salary.dat')
+data = file.read().decode('utf-8').splitlines()
+headers = data[0]
+df = pd.DataFrame(l.rstrip().split() for l in data[1:])
 df.columns = headers.rstrip().split()
 df['sl'] = df['sl'].astype(float) # Make sure salary is float
 df['yr'] = df['yr'].astype(int) # Make sure year is int is float
-df['yd'] = df['yd'].astype(int) # Make sure salary is float
+df['yd'] = df['yd'].astype(int) # Make sure salary is float```
 
 
 # ## Descriptive statistics
@@ -72,7 +84,7 @@ df[['sx', 'sl']].groupby('sx').agg('mean')
 # In[252]:
 
 # Separate into different arrays by sex
-males = df[df['sx'] == 'male'] 
+males = df[df['sx'] == 'male']
 females = df[df['sx'] == 'female']
 
 
@@ -129,7 +141,7 @@ df[['sx', 'yr', 'yd']].boxplot(by='sx')
 
 
 # ## Explore bivariate relationships visually
-# 
+#
 
 # Number of years since degree versus salary
 
@@ -172,7 +184,7 @@ df.plot(kind='scatter', x='yr', y='sl', ax=axs[1])
 # In[265]:
 
 # Sex by rank!
-sns.factorplot(x="sx", y="sl", 
+sns.factorplot(x="sx", y="sl",
                col="rk", data=df, kind="strip", jitter=True);
 
 
@@ -282,6 +294,3 @@ plt.show()
 # As shown above, this model clearly **over predicts** low salaries and **under predicts** higher salaries. Clearly, we're missing something that **explains variation** besides the number of years.
 
 # In[ ]:
-
-
-
